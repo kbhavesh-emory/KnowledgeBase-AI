@@ -1,25 +1,23 @@
-# 🧠 KnowledgeBase-AI  
+# KnowledgeBase-AI  
 > **A Local, GPU-Optimized Agentic RAG System for GitHub Repositories & Documents**
 
 ---
 
-## 📘 Overview
+## Overview
 
 **KnowledgeBase-AI** is a fully local, end-to-end **Retrieval-Augmented Generation (RAG)** and **Knowledge Management** system.  
 It enables you to chat with your **research documents**, **GitHub repositories**, and **scientific codebases** — all powered by local **LLMs via Ollama**.
 
 ### ✨ Features
-- 💬 **ChatGPT-style UI** with Markdown + syntax highlighting  
 - 🧠 **RAG pipeline** over documents & repositories  
 - 🧩 **GPU-accelerated embeddings** using SentenceTransformers  
 - ⚡ **Local LLM inference** via Ollama (`llama3:latest`)  
-- 📂 **Admin panel** for uploads, repo sync, embedding, and index rebuild  
 - 💾 **FAISS vectorstore + PixelTable persistence**  
 - 🔐 **Offline-first**, no external API keys required  
 
 ---
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```bash
 KnowledgeBase-AI/
@@ -85,15 +83,15 @@ KnowledgeBase-AI/
 
 ---
 
-## ⚙️ Installation
+## Installation
 
-### 🐍 Create environment
+### Create environment
 ```bash
 conda create -n knowledgebase-ai python=3.10 -y
 conda activate knowledgebase-ai
 ```
 
-### 📦 Install dependencies
+### Install dependencies
 ```bash
 pip install -r backend/requirements.txt
 ```
@@ -103,7 +101,7 @@ If you have a GPU (Tesla P100):
 pip install torch==2.0.1+cu118 torchvision torchaudio   --index-url https://download.pytorch.org/whl/cu118
 ```
 
-### 💻 Frontend setup
+### Frontend setup
 ```bash
 cd frontend
 npm install
@@ -112,7 +110,7 @@ cd ..
 
 ---
 
-## 🔧 Configuration
+## Configuration
 
 Edit `.env` or `backend/config/settings.py`:
 
@@ -128,7 +126,7 @@ PIXELTABLE_PATH=data/knowledgebase.db
 
 ---
 
-## 🚀 Run the System
+## Run the System
 
 ### 1️⃣ Start Ollama
 ```bash
@@ -153,3 +151,5 @@ cd frontend
 npm run dev
 ```
 Open [http://localhost:3000](http://localhost:3000)
+
+
