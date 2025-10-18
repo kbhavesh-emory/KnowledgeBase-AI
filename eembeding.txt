@@ -1,0 +1,42 @@
+# 1) Embed plain documents
+conda activate knowledgebase-ai
+python -m backend.scripts.embed_documents --path data/documents --glob "**/*"
+
+# 2) Embed repositories (code)
+python -m backend.scripts.embed_repositories --repos data/repositories --glob "**/*"
+
+# 3) Vector store tools
+python -m backend.scripts.vectorstore_manage stats
+python -m backend.scripts.vectorstore_manage query --q "how to start server" --k 5
+python -m backend.scripts.vectorstore_manage wipe
+python -m backend.scripts.vectorstore_manage rebuild --docs data/documents --repos data/repositories
+
+Summary Table
+Script	Folder	File Types	Primary Use
+embed_documents.py	data/documents/	
+.pdf, .docx, .md, .txt, .pptx, .csv, .yaml, etc.	Reports, manuals, docs
+embed_repositories.py	data/repositories/	
+.py, .js, .cpp, .json, .yml, .md, etc.	Codebases, configs
+vectorstore_manage.py	(no files directly)	—	Manage / query FAISS index
+
+sync
+
+🚀 Examples
+# 1) Sync using settings.GITHUB_REPOS from backend/config/settings.py
+python -m backend.scripts.sync_repositories
+
+# 2) Sync explicit repos (shallow clone)
+python -m backend.scripts.sync_repositories \
+  --repo https://github.com/pallets/flask \
+  --repo https://github.com/tiangolo/fastapi \
+  --shallow
+
+# 3) Sync from file, then embed
+python -m backend.scripts.sync_repositories --repos-file repos.txt
+python -m backend.scripts.embed_repositories --repos data/repositories --glob "**/*"
+
+# 4) One-shot: Sync + Embed
+python -m backend.scripts.sync_and_embed \
+  --repo https://github.com/pallets/flask \
+  --repo https://github.com/tiangolo/fastapi \
+  --shallow --glob "**/*.{py,md,txt,json,yaml}"

@@ -1,313 +1,280 @@
-GPU Optimization
-The system is optimized for P100 GPU with:
+#conda --version
+#conda info --envs
+#conda_on github-chatbot
+#conda_off
+#conda env list
 
-Mixed precision (FP16) training
+# crate env  conda install -c conda-forge faiss-gpu python=3.12 -y
 
-Batch processing (8,000 chunks/batch)
+Remove 
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+conda remove -n kb-ai --all -y
+conda activate knowledgebase-ai
+conda deactivate
+conda remove -n kb-ai --all -y
+curl -I http://127.0.0.1:8000/health
 
-Memory management and automatic cleanup
+curl -I http://einstein.neurology.emory.edu:8000/health
 
-Conservative batch sizes to prevent OOM
 
-📊 Usage
-Adding Data
-Upload Documents: Use the admin panel to upload documents
 
-Clone Repositories: Add GitHub repository URLs in the admin panel
+🧠 Deep-KnowledgeBase-AI
 
-Process Directories: Use the scripts to process local directories
+A Local, GPU-Optimized Agentic RAG System for GitHub Repositories & Documents
 
-Chat Interface
-Ask questions about your documents and repositories
+📘 Overview
 
-View sources for each answer
+Deep-KnowledgeBase-AI is a self-hosted, agentic Retrieval-Augmented Generation (RAG) system.
+It allows you to:
 
-Save important responses with the ⭐ button
+🧩 Chat with your documents and GitHub repositories using local LLMs (e.g. llama3:latest via Ollama)
 
-Real-time streaming responses
+🧠 Index and embed multi-format files (PDFs, Word, Markdown, code, etc.)
 
-Knowledge Base
-View all saved responses
+💾 Persist knowledge using FAISS vector store & PixelTable database
 
-Search and filter saved knowledge
+🧑‍💻 Manage all operations through a powerful Admin Panel
 
-Export knowledge base as JSON
+⚡ Run entirely offline (no OpenAI API key required)
 
-🚀 Performance
-Embedding Speed: ~1000 documents/minute on P100
+🎛️ GPU-optimized for Tesla P100 / CUDA
 
-Query Response: < 2 seconds for most queries
-
-Memory Usage: Optimized for 16GB GPU memory
-
-Storage: Compressed embeddings with FAISS optimization
-
-🔍 API Endpoints
-POST /api/v1/chat - Send chat message
-
-POST /api/v1/chat/save - Save response to knowledge base
-
-GET /api/v1/chat/saved - Get saved responses
-
-POST /api/v1/knowledge/upload - Upload document
-
-GET /api/v1/admin/status - System status
-
-POST /api/v1/admin/repositories/load - Load GitHub repositories
-
-# Project Structure
-
-KnowledgeBase-AI/
-├── backend/                 # FastAPI backend
-│   ├── api/               # API routes and middleware
-│   ├── core/              # Core system components
-│   ├── ingest/            # Document processing
-│   ├── vectorstore/       # FAISS vector store
-│   └── scripts/           # Management scripts
-├── frontend/              # React/Vite frontend
+🏗️ Project Structure
+Deep-KnowledgeBase-AI/
+│
+├── backend/
+│   ├── api/
+│   │   ├── main.py               # FastAPI entrypoint
+│   │   ├── auth.py               # (optional future use)
+│   │   ├── admin.py              # Admin panel endpoints (upload, embed, sync)
+│   │   ├── chat.py               # Chat API endpoint (LLM inference)
+│   │   ├── knowledge.py          # Knowledge base query/save APIs
+│   │   └── __init__.py
+│   │
+│   ├── config/
+│   │   ├── settings.py           # Global configuration (models, paths, repos)
+│   │   ├── logging.py            # Centralized logging
+│   │   └── __init__.py
+│   │
+│   ├── core/
+│   │   ├── agent.py              # LangChain / LLM agent orchestration
+│   │   ├── embeddings.py         # SentenceTransformer wrapper (GPU aware)
+│   │   ├── rag.py                # RAG pipeline combining retriever + generator
+│   │   ├── storage.py            # PixelTable / DuckDB persistence
+│   │   └── __init__.py
+│   │
+│   ├── ingest/
+│   │   ├── files.py              # Incremental document ingestion
+│   │   └── __init__.py
+│   │
+│   ├── scripts/
+│   │   ├── setup.py              # System setup / initialization
+│   │   ├── clone_repos.py        # Clone repositories via GitPython
+│   │   ├── embed_documents.py    # Embed all documents in /data/documents
+│   │   ├── embed_repositories.py # Embed all source code in /data/repositories
+│   │   ├── vectorstore_manage.py # Manage FAISS index (stats, rebuild, query)
+│   │   └── sync_repositories.py  # Sync GitHub repos from settings.py
+│   │
+│   ├── vectorstore/
+│   │   ├── faiss_wrapper.py      # FAISS index manager
+│   │   ├── manager.py            # Unified vector store manager
+│   │   └── __init__.py
+│   │
+│   ├── data/
+│   │   ├── documents/            # Uploaded documents
+│   │   ├── repositories/         # Cloned GitHub repositories
+│   │   ├── vectorstore/          # FAISS index storage
+│   │   └── knowledgebase.db      # PixelTable / DuckDB database
+│   │
+│   ├── requirements.txt          # Pinned dependencies
+│   ├── logging_config.yaml       # (optional logging settings)
+│   └── __init__.py
+│
+├── frontend/
+│   ├── index.html
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── vite.config.js
 │   └── src/
-│       ├── components/    # React components
-│       ├── hooks/         # Custom React hooks
-│       └── styles/        # CSS stylesheets
-├── data/                  # Data storage
-│   ├── repositories/      # Cloned GitHub repos
-│   ├── documents/         # Uploaded documents
-│   └── vectorstore/       # FAISS indices
-└── docker/               # Docker configuration
+│       ├── App.jsx               # Main ChatGPT-style UI
+│       ├── components/
+│       │   ├── AdminPanel.jsx    # Admin panel for uploads, sync, embedding
+│       ├── styles/
+│       │   ├── App.css           # Unified dark/light responsive design
+│       │   └── themes.css
+│       ├── constants.js
+│       ├── helpers.js
+│       ├── useApi.js
+│       ├── useStorage.js
+│       └── main.jsx
+│
+├── environment.yml               # Optional conda environment export
+├── .env                          # Environment variables (API_PORT, model name, etc.)
+└── README.md                     # This file
 
-# Access the application:
-
-Frontend: http://localhost:3000
-
-Backend API: http://localhost:8000
-
-API Documentation: http://localhost:8000/docs
-
-# Docker Setup
-docker-compose -f docker/docker-compose.yml up -d
-
-KnowledgeBase-AI/
-├── backend/                 # FastAPI backend
-│   ├── api/               # API routes and middleware
-│   ├── core/              # Core system components
-│   ├── ingest/            # Document processing
-│   ├── vectorstore/       # FAISS vector store
-│   └── scripts/           # Management scripts
-├── frontend/              # React/Vite frontend
-│   └── src/
-│       ├── components/    # React components
-│       ├── hooks/         # Custom React hooks
-│       └── styles/        # CSS stylesheets
-├── data/                  # Data storage
-│   ├── repositories/      # Cloned GitHub repos
-│   ├── documents/         # Uploaded documents
-│   └── vectorstore/       # FAISS indices
-└── docker/               # Docker configuration
-
-
-
-# Steps 
-
-cd backend
-source .venv/bin/activate
-uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
-
-
-CPU
-pip install torch --index-url https://download.pytorch.org/whl/cpu
-GPU
-pip install torch --index-url https://download.pytorch.org/whl/cu121
-
-
-Step 1: Start Required Services
-Terminal 1 - Start Ollama (LLM Service)
-
-bash
-# Make sure Ollama is running with your model
-ollama serve &
-ollama pull llama3:latest
-
-# Verify Ollama is working
-curl http://localhost:11434/api/tags
-Step 2: Start the Backend
-Terminal 2 - Backend Server
-
-bash
-# Navigate to your project
-cd /opt/bhavesh/Deep-KnowledgeBase-AI
-
-# Activate your conda environment
+⚙️ Installation
+🐍 1. Create Environment
+conda create -n knowledgebase-ai python=3.10 -y
 conda activate knowledgebase-ai
 
-# Start the FastAPI backend
+📦 2. Install Requirements
+pip install -r backend/requirements.txt
+
+
+If using GPU:
+
+# For CUDA 11.8 or similar:
+pip install torch==2.0.1+cu118 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+🧱 3. Frontend Setup
+cd frontend
+npm install
+cd ..
+
+🧩 Configuration
+Edit .env or backend/config/settings.py
+API_HOST=0.0.0.0
+API_PORT=8000
+LLM_PROVIDER=ollama
+LLM_MODEL=llama3:latest
+EMBEDDING_MODEL=BAAI/bge-small-en-v1.5
+VECTORSTORE_PATH=data/vectorstore
+PIXELTABLE_PATH=data/knowledgebase.db
+
+🧠 Running the System
+1️⃣ Start Ollama (must have model pulled)
+ollama pull llama3:latest
+ollama serve &
+
+2️⃣ Initialize Backend
 cd backend
-uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
-Step 3: Start the Frontend
-Terminal 3 - Frontend Development Server
+python -m scripts.setup -v
 
-bash
-# Navigate to frontend (new terminal)
-cd /opt/bhavesh/Deep-KnowledgeBase-AI/frontend
+3️⃣ Launch FastAPI Server
+cd /opt/bhavesh/Deep-KnowledgeBase-AI
+uvicorn backend.api.main:app --host 0.0.0.0 --port 8000 --reload
 
-# Install frontend dependencies (if not done)
-npm install
-
-# Start the development server
-npm run dev
-✅ Verification Steps
-Check Backend API
-bash
-# Test if backend is running
-curl http://localhost:8000/health
-
-# Check API documentation
-# Open in browser: http://localhost:8000/docs
-Check Frontend
-Open browser: http://localhost:3000
-
-You should see the ChatGPT-style interface
-
-📁 Project Structure Overview
-text
-Deep-KnowledgeBase-AI/
-├── backend/
-│   ├── api/main.py              # FastAPI server
-│   ├── core/                    # RAG, embeddings, storage
-│   ├── ingest/                  # Document processing
-│   └── vectorstore/             # FAISS vector store
-├── frontend/
-│   ├── src/App.jsx              # Main React app
-│   └── package.json             # Frontend dependencies
-├── data/
-│   ├── documents/               # Your documents go here
-│   ├── vectorstore/             # FAISS indices
-│   └── knowledgebase.db         # SQLite knowledge base
-└── requirements.txt             # Python dependencies
-🎯 Adding Your First Documents
-Option A: Add Documents via UI
-Go to http://localhost:3000
-
-Use the upload feature in the admin panel
-
-Upload PDFs, Word docs, text files, etc.
-
-Option B: Add Documents via API
-bash
-# Create a test document
-echo "This is a test document about artificial intelligence and machine learning." > test_doc.txt
-
-# Upload via API (if you have the endpoint)
-curl -X POST "http://localhost:8000/api/v1/knowledge/upload" \
-  -F "file=@test_doc.txt"
-Option C: Add GitHub Repositories
-bash
-# Via admin panel at http://localhost:3000
-# Or via API
-curl -X POST "http://localhost:8000/api/v1/admin/repositories/load" \
-  -H "Content-Type: application/json" \
-  -d '{"repo_urls": ["https://github.com/username/repo"]}'
-💬 Testing the Chat Interface
-Open http://localhost:3000
-
-Ask questions like:
-
-"What documents do you have?"
-
-"Explain artificial intelligence"
-
-"What is machine learning?"
-
-Save responses using the ⭐ button
-
-View saved responses in the Knowledge Base tab
-
-🔧 Troubleshooting Common Issues
-If Backend Fails to Start:
-bash
-# Check if all dependencies are installed
-python -c "import fastapi, langchain, sentence_transformers, torch, faiss; print('All imports OK')"
-
-# Check if Ollama is running
-curl http://localhost:11434/api/tags
-
-# Check port availability
-netstat -tulpn | grep 8000
-If Frontend Fails to Start:
-bash
-# Reinstall frontend dependencies
+4️⃣ Start Frontend
 cd frontend
-rm -rf node_modules package-lock.json
-npm install
 npm run dev
-If GPU Acceleration Isn't Working:
-bash
-# Verify GPU detection
-python -c "
+
+
+Now open → http://localhost:3000
+
+🧑‍💻 Admin Panel Features
+
+Access via the “Admin” tab in the UI:
+
+Action	Description
+📄 Upload Documents	Upload PDFs, Word, Markdown, CSV, etc.
+🔄 Sync Repositories	Clone / update GitHub repos (private repos use $GITHUB_TOKEN)
+🧠 Embed Documents	Generate embeddings for uploaded files
+🧩 Embed Repositories	Generate embeddings for code repositories
+🧰 Rebuild Index	Fully reindex all documents + code
+📊 View Stats	Check FAISS index size, dimensions, and status
+🧱 Data Organization
+data/
+├── documents/          # Uploaded documents (via admin panel)
+├── repositories/       # Cloned GitHub repositories
+├── vectorstore/        # FAISS index + metadata
+└── knowledgebase.db    # PixelTable persistence
+
+🧮 GPU Optimization
+Component	GPU Usage
+Embeddings	Uses SentenceTransformers on GPU (bge-small-en-v1.5)
+LLM Chat	Uses Ollama model (Llama3) with CUDA backend
+Indexing	FAISS compiled with BLAS acceleration
+
+To verify GPU:
+
+python - <<'PY'
 import torch
-print(f'CUDA: {torch.cuda.is_available()}')
+print("CUDA available:", torch.cuda.is_available())
 if torch.cuda.is_available():
-    print(f'GPU: {torch.cuda.get_device_name(0)}')
-"
-📊 Monitoring Your System
-Check System Status:
-bash
-# Backend health
-curl http://localhost:8000/health
+    print("Device:", torch.cuda.get_device_name(0))
+PY
 
-# System status
-curl http://localhost:8000/api/v1/admin/status
+🧰 Admin CLI (optional)
 
-# Vector store stats
-curl http://localhost:8000/api/v1/admin/index/stats
-Check Logs:
-bash
-# Backend logs (in the terminal running uvicorn)
-# Application logs
-tail -f logs/application.log
-🚀 Production Deployment Tips
-When ready for production:
+You can run these directly from the backend:
 
-Use production server:
+# Clone or update all repos
+python -m backend.scripts.sync_repositories
 
-bash
-uvicorn api.main:app --host 0.0.0.0 --port 8000 --workers 4
-Build frontend for production:
+# Embed all documents
+python -m backend.scripts.embed_documents --path data/documents
 
-bash
-cd frontend
-npm run build
-Use process manager (PM2, systemd):
+# Embed all repositories
+python -m backend.scripts.embed_repositories --path data/repositories
 
-bash
-pm2 start "uvicorn api.main:app --host 0.0.0.0 --port 8000" --name knowledgebase-ai
-🎉 You're Ready!
-Your KnowledgeBase AI should now be fully operational with:
+# Check FAISS index stats
+python -m backend.scripts.vectorstore_manage stats
 
-✅ GPU-accelerated embeddings (P100)
+🧩 Frontend Features
 
-✅ ChatGPT-style interface
+ChatGPT-style layout (markdown, syntax highlighting)
 
-✅ Document processing (PDF, Word, Excel, code files)
+Dark / light mode
 
-✅ GitHub repository integration
+Save responses to KnowledgeBase
 
-✅ Knowledge base saving (⭐ button)
+View KnowledgeBase entries
 
-✅ Real-time RAG responses
+Admin panel for upload / sync / embedding
 
-Start with Step 1 (Ollama), then Step 2 (Backend), then Step 3 (Frontend). The system will be available at http://localhost:3000! 🚀
+Responsive design for desktop and mobile
 
-Deep-KnowledgeBase-AI/
-├── backend/
-│   ├── api/main.py              # FastAPI server
-│   ├── core/                    # RAG, embeddings, storage
-│   ├── ingest/                  # Document processing
-│   └── vectorstore/             # FAISS vector store
-├── frontend/
-│   ├── src/App.jsx              # Main React app
-│   └── package.json             # Frontend dependencies
-├── data/
-│   ├── documents/               # Your documents go here
-│   ├── vectorstore/             # FAISS indices
-│   └── knowledgebase.db         # SQLite knowledge base
-└── requirements.txt             # Python dependencies# KnowledgeBase-AI
+📊 Example Workflow
+
+Go to Admin Panel → Upload ResearchPaper.pdf
+
+Click Embed Documents
+
+Paste GitHub repo URLs → Sync Repositories
+
+Click Embed Repositories
+
+Switch to Chat tab → Ask:
+
+“Summarize the pipeline steps in bdsa-workflows-slurm.”
+
+🧩 Export Current Environment (Freeze)
+
+Once working perfectly:
+
+pip freeze > backend/requirements.txt
+conda env export --no-builds > environment.yml
+
+🧩 Recreate Anywhere
+conda env create -f environment.yml
+conda activate knowledgebase-ai
+pip install -r backend/requirements.txt
+
+🔐 Private Repositories
+
+Before running sync commands:
+
+export GITHUB_TOKEN=ghp_your_token_here
+
+🛡️ Troubleshooting
+Issue	Solution
+ImportError: attempted relative import beyond top-level package	Always run commands from project root (/Deep-KnowledgeBase-AI)
+Ollama refused connection	Run ollama serve & before starting backend
+Failed to connect to port 8000	Ensure Uvicorn running on correct port (sudo ufw allow 8000/tcp)
+torch.cuda not compatible	Install torch version matching your CUDA (e.g. 2.0.1+cu118 for Tesla P100)
+🧾 License
+
+© 2025 Bhavesh —
+Developed at Emory University – School of Medicine.
+All rights reserved for internal research and educational use.
+
+🧩 Credits
+
+LangChain, SentenceTransformers, FAISS
+
+Ollama for local LLM inference
+
+PixelTable for knowledge persistence
+
+FastAPI + React (Vite) for modern web interface

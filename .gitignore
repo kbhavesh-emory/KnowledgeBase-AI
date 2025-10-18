@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.log
+*.sqlite
+.env
+.venv/
+venv/
+*.egg-info/
+*.egg
+
+# Node / frontend
+node_modules/
+frontend/dist/
+frontend/.vite/
+*.lock
+
+# Data and caches
+data/vectorstore/
+data/knowledgebase.db
+data/documents/
+data/repositories/
+logs/
+*.index
+*.jsonl
+
+# Jupyter and system
+*.ipynb_checkpoints
+.DS_Store
+.idea/
+.vscode/
+*.bak
